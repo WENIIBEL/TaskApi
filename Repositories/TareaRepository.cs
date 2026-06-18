@@ -37,8 +37,22 @@ namespace TaskApi.Repositories
             using var connection = GetConnection();
             var filas = await connection.ExecuteAsync("DELETE FROM Tareas WHERE Id = @Id", new { Id = id });
             return filas > 0;
+        
+        }
+
+        public async Task<bool> Crear(TareaModel tarea)
+        {
+            using var connection = GetConnection();
+            var sql = @"INSERT INTO Tareas (Titulo,Descripcion,Completada,FechaCreacion)
+                        VALUES (@Titulo, @Description, @Completada, @FechaCreacion);
+                        SELECT SCOPE_IDENTTITY();";
+            var id = await connection.ExecuteScalarAsync<int>(sql, tarea);
+            return id > 0;
         }
 
 
     }
 }
+
+
+/// ME FALTA  EL ACTUALIZAR Y OBTENER POR ID
