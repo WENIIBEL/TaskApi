@@ -1,3 +1,4 @@
+using System.ComponentModel.Design;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using TaskApi.Models;
@@ -24,6 +25,21 @@ namespace TaskApi.Repositories
             return await connection.QueryAsync<TareaModel>("SELECT * FROM Tareas");
 
         }
+
+        public async Task<TareaModel?> ObtenerPorId(int id)
+        {
+            using var connection = GetConnection();
+            return await connection.QueryFirstOrDefaultAsync<TareaModel>("SELECT * FROM Tareas WHERE Id = @Id", new { Id = id });
+        }
+        public async Task<bool> Crear(TareaModel tarea)
+        {
+            using var connection = GetConnection();
+            var sql = @"INSERT INTO Tareas (Titulo,Descripcion,Completada,FechaCreacion)
+                        VALUES (@Titulo, @Description, @Completada, @FechaCreacion);
+                        SELECT SCOPE_IDENTTITY();";
+            var id = await connection.ExecuteScalarAsync<int>(sql, tarea);
+            return id > 0;
+        }
         public async Task<bool> Actualizar(TareaModel tarea)
         {
             using var connection = GetConnection();
@@ -37,18 +53,11 @@ namespace TaskApi.Repositories
             using var connection = GetConnection();
             var filas = await connection.ExecuteAsync("DELETE FROM Tareas WHERE Id = @Id", new { Id = id });
             return filas > 0;
-        
+
         }
 
-        public async Task<bool> Crear(TareaModel tarea)
-        {
-            using var connection = GetConnection();
-            var sql = @"INSERT INTO Tareas (Titulo,Descripcion,Completada,FechaCreacion)
-                        VALUES (@Titulo, @Description, @Completada, @FechaCreacion);
-                        SELECT SCOPE_IDENTTITY();";
-            var id = await connection.ExecuteScalarAsync<int>(sql, tarea);
-            return id > 0;
-        }
+
+
 
 
     }
