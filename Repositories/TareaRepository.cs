@@ -31,14 +31,14 @@ namespace TaskApi.Repositories
             using var connection = GetConnection();
             return await connection.QueryFirstOrDefaultAsync<TareaModel>("SELECT * FROM Tareas WHERE Id = @Id", new { Id = id });
         }
-        public async Task<bool> Crear(TareaModel tarea)
+        public async Task<int> Crear(TareaModel tarea)
         {
             using var connection = GetConnection();
             var sql = @"INSERT INTO Tareas (Titulo,Descripcion,Completada,FechaCreacion)
                         VALUES (@Titulo, @Description, @Completada, @FechaCreacion);
                         SELECT SCOPE_IDENTTITY();";
-            var id = await connection.ExecuteScalarAsync<int>(sql, tarea);
-            return id > 0;
+              return await connection.ExecuteScalarAsync<int>(sql, tarea);
+             
         }
         public async Task<bool> Actualizar(TareaModel tarea)
         {
